@@ -1,27 +1,24 @@
-import React from 'react';
-import {
-  Text,
-  LayoutAnimation,
-  Pressable,
-  StyleSheet,
-  View,
-} from 'react-native'; // Simple native animations
+import React, { useContext } from 'react';
+import { Text, Pressable, StyleSheet, View } from 'react-native'; // Simple native animations
 import { headerSignal } from '../hooks/useSetHeader';
 import { useSignalValue } from '../hooks/useSignalValue';
 import { useNav } from '../hooks/useNav';
+import { NavContext } from './NavigationStack';
 
 export const SharedHeader = () => {
+  const store = useContext(NavContext)!;
   const config = useSignalValue(headerSignal);
   const nav = useNav();
-  console.log(config);
 
-  // When the title changes, trigger a layout animation for a smooth morph
-  React.useEffect(() => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-  }, [config.title]);
+  const onLayout = (e: any) => {
+    // PERFORMANCE NOTE:
+    // This runs on JS, but only when header size physically changes.
+    // Updating the SharedValue triggers UI-thread updates on all screens instantly.
+    store.headerHeight.value = e.nativeEvent.layout.height;
+  };
 
   return (
-    <View style={styles.portalHeader}>
+    <View style={styles.portalHeader} onLayout={onLayout}>
       <View style={styles.headerLeft}>
         {config.showBack && (
           <Pressable onPress={nav.pop} style={styles.backButton}>
@@ -32,13 +29,7 @@ export const SharedHeader = () => {
 
       {/* The Title container centers the text */}
       <View style={styles.headerCenter}>
-        <Text
-          key={config.title} // Key forces React to treat it as new, triggering animation
-          style={styles.portalTitle}
-          numberOfLines={1}
-        >
-          {config.title}
-        </Text>
+        <Text style={styles.portalTitle}>{config.title}</Text>
       </View>
 
       <View style={styles.headerRight} />
@@ -52,10 +43,6 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    height: 100, // Matches screen paddingTop
-    paddingTop: 50, // Safe Area
-    flexDirection: 'row',
-    alignItems: 'center',
     backgroundColor: 'rgba(255,255,255,0.95)', // Slight translucency looks premium
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',

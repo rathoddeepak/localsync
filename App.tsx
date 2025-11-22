@@ -1,23 +1,13 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, StyleSheet, Text, Pressable } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { NavigationStack } from './src/libs/navigator/components/NavigationStack';
 import { useNav } from './src/libs/navigator/hooks/useNav';
 import { Signal } from './src/libs/navigator/utils/signal';
 import { useParamsSignal } from './src/libs/navigator/hooks/useParamSignal';
-import { useSetHeader } from './src/libs/navigator/hooks/useSetHeader';
-
-// 1. Header Title that updates via Signal (Fine-Grained)
-const SignalHeader = ({ title }: { title: string }) => (
-  <View style={styles.header}>
-    <Text style={styles.headerTitle}>{title}</Text>
-  </View>
-);
 
 const HomeScreen = () => {
   const nav = useNav();
-
-  useSetHeader({ title: 'Telegram Inbox', showBack: false });
 
   return (
     <View style={styles.page}>
@@ -42,10 +32,13 @@ const HomeScreen = () => {
 
 const DetailsScreen = ({ params$ }: { params$: Signal<any> }) => {
   const nav = useNav();
+  const id = useParamsSignal(params$, 'id');
+
   // Fine-grained: This component renders ONCE.
   // Only 'id' text node updates if signal changes (simulated here via hook).
-  const id = useParamsSignal(params$, 'id');
-  useSetHeader({ title: `Conversation ${id}`, showBack: true });
+  useEffect(() => {
+    nav.updateHeader({ title: 'Chat with ' + id });
+  }, []);
 
   return (
     <View style={styles.page}>
@@ -63,7 +56,6 @@ const DetailsScreen = ({ params$ }: { params$: Signal<any> }) => {
 
 const SettingsScreen = () => (
   <View style={styles.page}>
-    <SignalHeader title="Settings" />
     <View style={styles.content}>
       <Text>The screens below this one are frozen.</Text>
     </View>

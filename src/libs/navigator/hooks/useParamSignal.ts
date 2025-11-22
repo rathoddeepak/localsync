@@ -12,7 +12,7 @@ export const useParamsSignal = (params$: Signal<any>, key: string) => {
     // A real Legend implementation would use Proxies for key-based subscription
     return () => {
       if (typeof params$.subscribe === 'function') {
-        params$.subscribe(newParams => {
+        params$.subscribe((newParams: any) => {
           if (newParams[key] !== val) setVal(newParams[key]);
         });
       }

@@ -42,7 +42,7 @@ export const NavigationStack = ({
       <View style={styles.container}>
         {/* Here is the "Legend-List" inspiration:
            We map the stack. React handles the reconciliation.
-           Because <LegendaryScreenWrapper> is Memoized with a custom comparator,
+           Because <ScreenWrapper> is Memoized with a custom comparator,
            existing screens DO NOT RE-RENDER when we push a new one.
         */}
         {stack.map(route => (

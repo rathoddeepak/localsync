@@ -7,5 +7,7 @@ export const useNav = () => {
   return {
     push: (name: string, params?: any) => store.push(name, params),
     pop: () => store.pop(),
+    updateHeader: (config: any) => store.updateHeader(config),
+    setParams: (key: string, p: any) => store.setParams(key, p),
   };
 };
